@@ -1,0 +1,80 @@
+name: kube-deploy-target
+env:
+  cluster_name: "MAINCLUSTER"
+  cluster_resource_group: "VIME-KUBERNETES-MAINCLUSTER"
+  namespace_prefix: "vime-"
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
+        description: Target environment for the deployment
+      image_name:
+        required: true
+        type: string
+        description: The name of the image to build / deploy
+      version:
+        required: false
+        description: Set the semver version to be deployed. Omit for latest.
+        type: string
+        default: latest
+    secrets:
+      container_registry_url:
+        required: true
+      azure_credentials:
+        required: true
+      container_registry_password:
+        required: true
+      container_registry_username:
+        required: true
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Select correct github tag
+        id: tag_selector
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # this secret is automatically populated by GHA
+        run: |
+          if [ ${{ github.event.inputs.version }} = 'latest' ];
+          then
+            echo "::set-output name=tag::$(gh release view --json tagName -q .tagName)"
+            echo "$(gh release view --json tagName -q .tagName)"
+          else
+            echo "::set-output name=tag::${{ github.event.inputs.version}}"
+          fi
+
+      # Set the target AKS cluster for the following kubernetes actions
+      - uses: Azure/aks-set-context@v1
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS }}"
+          cluster-name: "${{ env.cluster_name }}"
+          resource-group: "${{ env.cluster_resource_group }}"
+
+      - name: Set imagePullSecret
+        uses: azure/k8s-create-secret@v1
+        with:
+          namespace: ${{ env.namespace_prefix }}${{ inputs.target }}
+          container-registry-url: ${{ secrets.container_registry_url }}
+          container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+          container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+          secret-name: "container-registry-secret"
+
+      - uses: Azure/k8s-deploy@v1.2
+        with:
+          manifests: |
+            kubernetes/deployment.yaml
+            kubernetes/service.yaml
+            kubernetes/ingress-${{ github.event.inputs.target }}.yaml
+          images: |
+            ${{ secrets.container_registry_url }}/${{ inputs.image_name }}:${{ steps.tag_selector.outputs.tag }}
+          imagepullsecrets: |
+            container-registry-secret
+          namespace: ${{ env.namespace_prefix }}${{ github.event.inputs.target }}
