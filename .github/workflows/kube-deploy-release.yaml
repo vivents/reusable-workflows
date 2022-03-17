@@ -17,6 +17,7 @@ on:
         type: string
         description: The kubernetes manifests to deploy
     secrets:
+      # required infrastructure secrets
       container_registry_url:
         required: true
       azure_credentials:
@@ -25,6 +26,15 @@ on:
         required: true
       container_registry_username:
         required: true
+      # application secrets, only required for some services
+      secret:
+        required: false
+      jitsi_secret:
+        required: false
+      database_url:
+        required: false
+      sendinblue_api_key:
+        required: false
 
 jobs:
   deploy:
@@ -73,6 +83,16 @@ jobs:
           container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
           secret-name: "container-registry-secret"
 
+      - name: Populate runtime env vars with secrets
+        uses: vivents/replace-action@main
+        with:
+          files: ${{ inputs.manifests }}
+          replacements: |
+            $SECRET=${{ secrets.secret }}
+            $JITSI_SECRET=${{ secrets.jitsi_secret }}
+            $DATABASE_URL=${{ secrets.database_url }}
+            $SENDINBLUE_API_KEY=${{ secrets.sendinblue_api_key }}
+        
       - uses: Azure/k8s-deploy@v1.2
         with:
           manifests: ${{ inputs.manifests }}
