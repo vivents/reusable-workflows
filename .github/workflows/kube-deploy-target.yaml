@@ -7,19 +7,19 @@ env:
 on:
   workflow_call:
     inputs:
-      target:
-        required: true
-        type: string
-        description: Target environment for the deployment
+      # target:
+      #   required: true
+      #   type: string
+      #   description: Target environment for the deployment
       image_name:
         required: true
         type: string
         description: The name of the image to build / deploy
-      version:
-        required: false
-        description: Set the semver version to be deployed. Omit for latest.
-        type: string
-        default: latest
+      # version:
+      #   required: false
+      #   description: Set the semver version to be deployed. Omit for latest.
+      #   type: string
+      #   default: latest
     secrets:
       container_registry_url:
         required: true
