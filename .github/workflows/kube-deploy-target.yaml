@@ -69,10 +69,7 @@ jobs:
 
       - uses: Azure/k8s-deploy@v1.2
         with:
-          manifests: |
-            kubernetes/deployment.yaml
-            kubernetes/service.yaml
-            kubernetes/ingress-${{ github.event.inputs.target }}.yaml
+          manifests: ${{ inputs.manifests }}
           images: |
             ${{ secrets.container_registry_url }}/${{ inputs.image_name }}:${{ steps.tag_selector.outputs.tag }}
           imagepullsecrets: |

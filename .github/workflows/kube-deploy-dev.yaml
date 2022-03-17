@@ -12,6 +12,10 @@ on:
         required: true
         type: string
         description: The name of the image to build / deploy
+      manifests:
+        required: true
+        type: string
+        description: The kubernetes manifests to deploy
     secrets:
       container_registry_url:
         required: true
@@ -72,10 +76,7 @@ jobs:
 
       - uses: Azure/k8s-deploy@v1.2
         with:
-          manifests: |
-            kubernetes/deployment.yaml
-            kubernetes/service.yaml
-            kubernetes/ingress-dev.yaml
+          manifests: ${{ inputs.manifests }}
           images: |
             ${{ secrets.container_registry_url }}/${{ inputs.image_name }}:${{ github.sha }}
           imagepullsecrets: |
