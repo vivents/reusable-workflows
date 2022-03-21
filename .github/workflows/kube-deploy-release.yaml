@@ -28,6 +28,8 @@ on:
         required: true
       container_registry_username:
         required: true
+      gh_access_token:
+        required: true
       # application secrets, only required for some services
       secret:
         required: false
@@ -67,7 +69,7 @@ jobs:
           tags: |
             ${{ inputs.container_registry_url }}/${{ inputs.image_name }}:${{ github.event.release.tag_name }}
           build-args: |
-            GH_ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            GH_ACCESS_TOKEN=${{ secrets.gh_access_token }}
 
       # Set the target AKS cluster for the following kubernetes actions
       - uses: Azure/aks-set-context@v1

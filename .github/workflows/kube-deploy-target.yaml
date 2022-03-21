@@ -28,6 +28,8 @@ on:
         required: true
       container_registry_username:
         required: true
+      gh_access_token:
+        required: true
       # application secrets, only required for some services
       secret:
         required: false
@@ -49,7 +51,7 @@ jobs:
       - name: Select correct github tag
         id: tag_selector
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # this secret is automatically populated by GHA
+          GITHUB_TOKEN: ${{ secrets.gh_access_token }} # this secret is automatically populated by GHA
         run: |
           if [ ${{ github.event.inputs.version }} = 'latest' ];
           then
@@ -62,7 +64,7 @@ jobs:
       # Set the target AKS cluster for the following kubernetes actions
       - uses: Azure/aks-set-context@v1
         with:
-          creds: "${{ secrets.AZURE_CREDENTIALS }}"
+          creds: "${{ secrets.azure_credentials }}"
           cluster-name: "${{ env.cluster_name }}"
           resource-group: "${{ env.cluster_resource_group }}"
 
