@@ -17,14 +17,24 @@ on:
         type: string
         description: The kubernetes manifests to deploy
     secrets:
-      container_registry_url:
-        required: true
+      # required infrastructure secrets
       azure_credentials:
+        required: true
+      container_registry_url:
         required: true
       container_registry_password:
         required: true
       container_registry_username:
         required: true
+      # application secrets, only required for some services
+      secret:
+        required: false
+      jitsi_secret:
+        required: false
+      database_url:
+        required: false
+      sendinblue_api_key:
+        required: false
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -73,6 +83,16 @@ jobs:
           container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
           container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
           secret-name: "container-registry-secret"
+
+      - name: Populate runtime env vars with secrets
+        uses: vivents/replace-action@main
+        with:
+          files: ${{ inputs.manifests }}
+          replacements: |
+            $SECRET=${{ secrets.secret }}
+            $JITSI_SECRET=${{ secrets.jitsi_secret }}
+            $DATABASE_URL=${{ secrets.database_url }}
+            $SENDINBLUE_API_KEY=${{ secrets.sendinblue_api_key }}
 
       - uses: Azure/k8s-deploy@v1.2
         with:

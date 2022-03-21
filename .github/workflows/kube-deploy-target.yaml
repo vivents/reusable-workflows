@@ -1,4 +1,5 @@
 name: kube-deploy-target
+
 env:
   cluster_name: "MAINCLUSTER"
   cluster_resource_group: "VIME-KUBERNETES-MAINCLUSTER"
@@ -7,28 +8,29 @@ env:
 on:
   workflow_call:
     inputs:
-      # target:
-      #   required: true
-      #   type: string
-      #   description: Target environment for the deployment
       image_name:
         required: true
         type: string
         description: The name of the image to build / deploy
-      # version:
-      #   required: false
-      #   description: Set the semver version to be deployed. Omit for latest.
-      #   type: string
-      #   default: latest
     secrets:
-      container_registry_url:
-        required: true
+      # required infrastructure secrets
       azure_credentials:
+        required: true
+      container_registry_url:
         required: true
       container_registry_password:
         required: true
       container_registry_username:
         required: true
+      # application secrets, only required for some services
+      secret:
+        required: false
+      jitsi_secret:
+        required: false
+      database_url:
+        required: false
+      sendinblue_api_key:
+        required: false
 
 jobs:
   deploy:
@@ -66,6 +68,16 @@ jobs:
           container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
           container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
           secret-name: "container-registry-secret"
+
+      - name: Populate runtime env vars with secrets
+        uses: vivents/replace-action@main
+        with:
+          files: ${{ inputs.manifests }}
+          replacements: |
+            $SECRET=${{ secrets.secret }}
+            $JITSI_SECRET=${{ secrets.jitsi_secret }}
+            $DATABASE_URL=${{ secrets.database_url }}
+            $SENDINBLUE_API_KEY=${{ secrets.sendinblue_api_key }}
 
       - uses: Azure/k8s-deploy@v1.2
         with:
