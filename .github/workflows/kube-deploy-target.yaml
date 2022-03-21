@@ -12,11 +12,17 @@ on:
         required: true
         type: string
         description: The name of the image to build / deploy
+      manifests:
+        required: true
+        type: string
+        description: The kubernetes manifests to deploy
+      container_registry_url:
+        required: true
+        type: string
+        description: The URL of the container registry the image should be stored at
     secrets:
       # required infrastructure secrets
       azure_credentials:
-        required: true
-      container_registry_url:
         required: true
       container_registry_password:
         required: true
@@ -64,7 +70,7 @@ jobs:
         uses: azure/k8s-create-secret@v1
         with:
           namespace: ${{ env.namespace_prefix }}${{ inputs.target }}
-          container-registry-url: ${{ secrets.container_registry_url }}
+          container-registry-url: ${{ inputs.container_registry_url }}
           container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
           container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
           secret-name: "container-registry-secret"
@@ -83,7 +89,7 @@ jobs:
         with:
           manifests: ${{ inputs.manifests }}
           images: |
-            ${{ secrets.container_registry_url }}/${{ inputs.image_name }}:${{ steps.tag_selector.outputs.tag }}
+            ${{ inputs.container_registry_url }}/${{ inputs.image_name }}:${{ steps.tag_selector.outputs.tag }}
           imagepullsecrets: |
             container-registry-secret
           namespace: ${{ env.namespace_prefix }}${{ github.event.inputs.target }}

@@ -16,11 +16,13 @@ on:
         required: true
         type: string
         description: The kubernetes manifests to deploy
+      container_registry_url:
+        required: true
+        type: string
+        description: The URL of the container registry the image should be stored at
     secrets:
       # required infrastructure secrets
       azure_credentials:
-        required: true
-      container_registry_url:
         required: true
       container_registry_password:
         required: true
@@ -47,7 +49,7 @@ jobs:
       # Login to the azure container registry to be able to push the image
       - uses: Azure/docker-login@v1
         with:
-          login-server: ${{ secrets.container_registry_url }}
+          login-server: ${{ inputs.container_registry_url }}
           username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
           password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
 
@@ -63,7 +65,7 @@ jobs:
           # platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ secrets.container_registry_url }}/${{ inputs.image_name }}:${{ github.event.release.tag_name }}
+            ${{ inputs.container_registry_url }}/${{ inputs.image_name }}:${{ github.event.release.tag_name }}
           build-args: |
             GH_ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
@@ -78,7 +80,7 @@ jobs:
         uses: azure/k8s-create-secret@v1
         with:
           namespace: "${{ env.cluster_namespace }}"
-          container-registry-url: ${{ secrets.container_registry_url }}
+          container-registry-url: ${{ inputs.container_registry_url }}
           container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
           container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
           secret-name: "container-registry-secret"
@@ -97,7 +99,7 @@ jobs:
         with:
           manifests: ${{ inputs.manifests }}
           images: |
-            ${{ secrets.container_registry_url }}/${{ inputs.image_name }}:${{ github.event.release.tag_name }}
+            ${{ inputs.container_registry_url }}/${{ inputs.image_name }}:${{ github.event.release.tag_name }}
           imagepullsecrets: |
             container-registry-secret
           namespace: ${{ env.cluster_namespace }}
