@@ -76,7 +76,7 @@ jobs:
           secret-name: "container-registry-secret"
 
       - name: Populate runtime env vars with secrets
-        uses: vivents/replace-action@main
+        uses: vivents/replace-action@master
         with:
           files: ${{ inputs.manifests }}
           replacements: |
