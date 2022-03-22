@@ -93,10 +93,10 @@ jobs:
         run: |
           kubectl create secret generic vivents-secrets \
           --namespace=${{ env.namespace_prefix }}${{ inputs.target }} \
-          --from-literal=SECRET=${{ secrets.secret }} \
-          --from-literal=JITSI_SECRET=${{ secrets.jitsi_secret }} \
-          --from-literal=DATABASE_URL=${{ secrets.database_url }} \
-          --from-literal=SENDINBLUE_API_KEY=${{ secrets.sendinblue_api_key }} \
+          --from-literal=SECRET="${{ secrets.secret }}" \
+          --from-literal=JITSI_SECRET="${{ secrets.jitsi_secret }}" \
+          --from-literal=DATABASE_URL="${{ secrets.database_url }}" \
+          --from-literal=SENDINBLUE_API_KEY="${{ secrets.sendinblue_api_key }}" \
           --dry-run=client \
           -o yaml \
           | kubectl apply -f -
