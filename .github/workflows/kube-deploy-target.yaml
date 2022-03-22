@@ -78,13 +78,18 @@ jobs:
           secret-name: "container-registry-secret"
 
       - name: Create kubernetes secret
+        # the dry run / piping syntax is a required workaround for updating
+        # an existing secret using the cli
         run: |
           kubectl create secret generic vivents-secrets \
           --namespace=${{ env.namespace_prefix }}${{ inputs.target }} \
           --from-literal=SECRET=${{ secrets.secret }} \
           --from-literal=JITSI_SECRET=${{ secrets.jitsi_secret }} \
           --from-literal=DATABASE_URL=${{ secrets.database_url }} \
-          --from-literal=SENDINBLUE_API_KEY=${{ secrets.sendinblue_api_key }}
+          --from-literal=SENDINBLUE_API_KEY=${{ secrets.sendinblue_api_key }} \
+          --dry-run=client \
+          -o yaml \
+          | kubectl apply -f -
 
       - uses: Azure/k8s-deploy@v1.2
         with:
