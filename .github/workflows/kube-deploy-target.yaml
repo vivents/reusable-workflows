@@ -77,15 +77,14 @@ jobs:
           container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
           secret-name: "container-registry-secret"
 
-      - name: Populate runtime env vars with secrets
-        uses: vivents/replace-action@master
-        with:
-          files: ${{ inputs.manifests }}
-          replacements: |
-            $SECRET=${{ secrets.secret }}
-            $JITSI_SECRET=${{ secrets.jitsi_secret }}
-            $DATABASE_URL=${{ secrets.database_url }}
-            $SENDINBLUE_API_KEY=${{ secrets.sendinblue_api_key }}
+      - name: Create kubernetes secret
+        run: |
+          kubectl create secret generic vivents-secrets \
+          --namespace=${{ env.namespace_prefix }}${{ inputs.target }}
+          --from-literal=SECRET=${{ secrets.secret }} \
+          --from-literal=JITSI_SECRET=${{ secrets.jitsi_secret }} \
+          --from-literal=DATABASE_URL=${{ secrets.database_url }} \
+          --from-literal=SENDINBLUE_API_KEY=${{ secrets.sendinblue_api_key }}
 
       - uses: Azure/k8s-deploy@v1.2
         with:
