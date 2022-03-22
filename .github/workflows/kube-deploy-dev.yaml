@@ -91,10 +91,10 @@ jobs:
         run: |
           kubectl create secret generic vivents-secrets \
           --namespace=${{ env.cluster_namespace }}
-          --from-literal=secret=${{ secrets.secret }} \
-          --from-literal=jitsi_secret=${{ secrets.jitsi_secret }} \
-          --from-literal=database_url=${{ secrets.database_url }} \
-          --from-literal=sendinblue_api_key=${{ secrets.sendinblue_api_key }}
+          --from-literal=SECRET=${{ secrets.secret }} \
+          --from-literal=JITSI_SECRET=${{ secrets.jitsi_secret }} \
+          --from-literal=DATABASE_URL=${{ secrets.database_url }} \
+          --from-literal=SENDINBLUE_API_KEY=${{ secrets.sendinblue_api_key }}
 
       - uses: Azure/k8s-deploy@v1.2
         with:
