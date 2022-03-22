@@ -90,7 +90,7 @@ jobs:
       - name: Create kubernetes secret
         run: |
           kubectl create secret generic vivents-secrets \
-          --namespace=${{ env.cluster_namespace }}
+          --namespace=${{ env.cluster_namespace }} \
           --from-literal=SECRET=${{ secrets.secret }} \
           --from-literal=JITSI_SECRET=${{ secrets.jitsi_secret }} \
           --from-literal=DATABASE_URL=${{ secrets.database_url }} \
