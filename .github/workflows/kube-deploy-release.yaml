@@ -92,7 +92,7 @@ jobs:
         # an existing secret using the cli
         run: |
           kubectl create secret generic vivents-secrets \
-          --namespace=${{ env.namespace_prefix }}${{ inputs.target }} \
+          --namespace=${{ env.cluster_namespace }} \
           --from-literal=SECRET="${{ secrets.secret }}" \
           --from-literal=JITSI_SECRET="${{ secrets.jitsi_secret }}" \
           --from-literal=DATABASE_URL="${{ secrets.database_url }}" \
