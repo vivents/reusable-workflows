@@ -4,6 +4,7 @@ env:
   cluster_name: "MAINCLUSTER"
   cluster_resource_group: "VIME-KUBERNETES-MAINCLUSTER"
   namespace_prefix: "vime-"
+  image_prefix: "vime"
 
 on:
   workflow_call:
@@ -93,7 +94,7 @@ jobs:
         with:
           manifests: ${{ inputs.manifests }}
           images: |
-            ${{ inputs.container_registry_url }}/${{ inputs.image_name }}:${{ steps.tag_selector.outputs.tag }}
+            ${{ inputs.container_registry_url }}/${{ env.image_prefix }}/${{ inputs.image_name }}:${{ steps.tag_selector.outputs.tag }}
           imagepullsecrets: |
             container-registry-secret
           namespace: ${{ env.namespace_prefix }}${{ github.event.inputs.target }}
