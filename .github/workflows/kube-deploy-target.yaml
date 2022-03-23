@@ -77,16 +77,14 @@ jobs:
           container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
           secret-name: "container-registry-secret"
 
-      - name: Create kubernetes secret
+      - name: Create kubernetes secret with database url
+        if: ${{ secrets.database_url != "" }}
         # the dry run / piping syntax is a required workaround for updating
         # an existing secret using the cli
         run: |
-          kubectl create secret generic vivents-secrets \
-          --namespace=${{ env.namespace_prefix }}${{ inputs.target }} \
-          --from-literal=SECRET="${{ secrets.secret }}" \
-          --from-literal=JITSI_SECRET="${{ secrets.jitsi_secret }}" \
+          kubectl create secret generic ${{ inputs.image_name }}-secrets \
+          --namespace=${{ env.namespace_prefix }}${{ github.event.inputs.target }} \
           --from-literal=DATABASE_URL="${{ secrets.database_url }}" \
-          --from-literal=SENDINBLUE_API_KEY="${{ secrets.sendinblue_api_key }}" \
           --dry-run=client \
           -o yaml \
           | kubectl apply -f -
