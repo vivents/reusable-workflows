@@ -89,16 +89,18 @@ jobs:
           secret-name: "container-registry-secret"
 
       - name: Create kubernetes secret with database url
-        if: ${{ secrets.database_url != '' }}
         # the dry run / piping syntax is a required workaround for updating
         # an existing secret using the cli
         run: |
-          kubectl create secret generic ${{ inputs.image_name }}-secrets \
-          --namespace=${{ env.cluster_namespace }} \
-          --from-literal=DATABASE_URL="${{ secrets.database_url }}" \
-          --dry-run=client \
-          -o yaml \
-          | kubectl apply -f -
+          if [ secrets.database_url != "" ]
+          then
+            kubectl create secret generic ${{ inputs.image_name }}-secrets \
+            --namespace=${{ env.cluster_namespace }} \
+            --from-literal=DATABASE_URL="${{ secrets.database_url }}" \
+            --dry-run=client \
+            -o yaml \
+            | kubectl apply -f -
+          fi
         
       - uses: Azure/k8s-deploy@v1.2
         with:
