@@ -1,4 +1,4 @@
-name: kube-deploy-release
+name: kube-deploy-test
 
 env:
   cluster_name: "MAINCLUSTER"
