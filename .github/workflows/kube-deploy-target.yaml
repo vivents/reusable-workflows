@@ -79,7 +79,7 @@ jobs:
           secret-name: "container-registry-secret"
 
       - name: Create kubernetes secret with database url
-        if: ${{ secrets.database_url != "" }}
+        if: ${{ secrets.database_url != '' }}
         # the dry run / piping syntax is a required workaround for updating
         # an existing secret using the cli
         run: |
