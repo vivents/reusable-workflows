@@ -71,6 +71,8 @@ jobs:
             ${{ inputs.container_registry_url }}/${{ env.image_prefix }}/${{ inputs.image_name }}:${{ github.sha }}
           build-args: |
             GH_ACCESS_TOKEN=${{ secrets.gh_access_token }}
+          cache-from: type=gha
+          cache-to: type=gha
 
       # Set the target AKS cluster for the following kubernetes actions
       - uses: Azure/aks-set-context@v1
