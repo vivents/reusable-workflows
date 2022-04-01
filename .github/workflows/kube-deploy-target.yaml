@@ -69,15 +69,6 @@ jobs:
           cluster-name: "${{ env.cluster_name }}"
           resource-group: "${{ env.cluster_resource_group }}"
 
-      - name: Set imagePullSecret
-        uses: azure/k8s-create-secret@v1
-        with:
-          namespace: ${{ env.namespace_prefix }}${{ inputs.target }}
-          container-registry-url: ${{ inputs.container_registry_url }}
-          container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
-          container-registry-password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
-          secret-name: "container-registry-secret"
-
       - name: Create kubernetes secret with database url
         # the dry run / piping syntax is a required workaround for updating
         # an existing secret using the cli
