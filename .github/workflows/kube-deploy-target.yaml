@@ -88,6 +88,4 @@ jobs:
           manifests: ${{ inputs.manifests }}
           images: |
             ${{ inputs.container_registry_url }}/${{ env.image_prefix }}/${{ inputs.image_name }}:${{ steps.tag_selector.outputs.tag }}
-          imagepullsecrets: |
-            container-registry-secret
           namespace: ${{ env.namespace_prefix }}${{ github.event.inputs.target }}
