@@ -85,7 +85,7 @@ jobs:
         # the dry run / piping syntax is a required workaround for updating
         # an existing secret using the cli
         run: |
-          if [ secrets.database_url != "" ]
+          if [ "${{ secrets.database_url }}" != "" ]
           then
             kubectl create secret generic ${{ inputs.image_name }}-secrets \
             --namespace=${{ env.cluster_namespace }} \
