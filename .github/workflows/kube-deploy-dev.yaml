@@ -91,7 +91,9 @@ jobs:
 
       - uses: Azure/k8s-deploy@v1.5
         with:
+          if: inputs.manifests != ""
           manifests: ${{ inputs.manifests }}
           images: |
             ${{ inputs.container_registry_url }}/${{ env.image_prefix }}/${{ inputs.image_name }}:${{ github.sha }}
+            ${{ inputs.container_registry_url }}/${{ env.image_prefix }}/${{ inputs.migration_image }}:${{ github.sha }}
           namespace: ${{ env.cluster_namespace }}
