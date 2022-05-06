@@ -27,6 +27,7 @@ on:
         description: Specifies a second migration image in addition to image_name.
       dockerfile:
         required: false
+        type: string
         default: "Dockerfile"
         description: Specifies the dockerfile for building the image
     secrets:
