@@ -32,13 +32,7 @@ on:
       gh_access_token:
         required: true
       # application secrets, only required for some services
-      secret:
-        required: false
-      jitsi_secret:
-        required: false
       database_url:
-        required: false
-      sendinblue_api_key:
         required: false
 
 jobs:
