@@ -21,6 +21,15 @@ on:
         required: true
         type: string
         description: The URL of the container registry the image should be stored at
+      migration_image:
+        required: false
+        type: string
+        description: Specifies a second migration image in addition to image_name.
+      dockerfile:
+        required: false
+        type: string
+        default: "Dockerfile"
+        description: Specifies the dockerfile for building the image
     secrets:
       # required infrastructure secrets
       azure_credentials:
@@ -59,6 +68,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
+          file: ${{ inputs.dockerfile }}
           # platforms: linux/amd64,linux/arm64
           push: true
           tags: |
@@ -89,9 +99,11 @@ jobs:
             | kubectl apply -f -
           fi
         
-      - uses: Azure/k8s-deploy@v1.2
+      - uses: Azure/k8s-deploy@v1.5
+        if: inputs.manifests != ''
         with:
           manifests: ${{ inputs.manifests }}
           images: |
             ${{ inputs.container_registry_url }}/${{ env.image_prefix}}/${{ inputs.image_name }}:${{ github.event.release.tag_name }}
+            ${{ inputs.container_registry_url }}/${{ env.image_prefix }}/${{ inputs.migration_image }}:${{ github.event.release.tag_name }}
           namespace: ${{ env.cluster_namespace }}
